@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="document-edit">icons/scalable/actions/document-edit.svgz</file>
+    <file alias="go-previous">icons/scalable/actions/go-previous.svgz</file>
+    <file alias="go-next">icons/scalable/actions/go-next.svgz</file>
+    <file alias="document-save">icons/scalable/actions/document-save.svgz</file>
+    <file alias="application-exit">icons/scalable/actions/application-exit.svgz</file>
+    <file alias="chronometer">icons/scalable/actions/chronometer.svgz</file>
+    <file alias="go-home">icons/scalable/actions/go-home.svgz</file>
+    <file alias="document-preview">icons/scalable/actions/document-preview.svgz</file>
+    <file alias="go-jump-today">icons/scalable/actions/go-jump-today.svgz</file>
+  </qresource>
+</RCC>
