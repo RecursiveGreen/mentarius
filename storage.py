@@ -68,7 +68,7 @@ class Sqlite3Storage(BaseStorage):
 
         return entries
 
-    def save(self, dbfile, entries):
+    def save(self, dbfile, entries, to_delete):
         db = sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES)
         cur = db.cursor()
         for entry in entries:
@@ -101,6 +101,13 @@ class Sqlite3Storage(BaseStorage):
                       entry.date_published,
                       entry.body,
                       entry.title))
+            db.commit()
+
+        for entry in to_delete:
+            cur.execute('''
+                DELETE FROM entries
+                WHERE entry_id = ?
+            ''', (entry.entry_id,))
             db.commit()
 
         db.close()

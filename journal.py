@@ -32,7 +32,7 @@ class Journal(object):
     def __init__(self, config=dict()):
         self.config = config
         self.entries = list()
-        self.deleted = list()
+        self.to_delete = list()
         self.current_entry = None
 
     def new(self, filename):
@@ -48,7 +48,7 @@ class Journal(object):
     def save(self):
         s = Sqlite3Storage()
         modified_entries = [x for x in self.entries if x.modified]
-        s.save(self.config['filename'], modified_entries)
+        s.save(self.config['filename'], modified_entries, self.to_delete)
 
 
 # recordedip = [x['value']

@@ -228,10 +228,10 @@ class EntryListModel(QtCore.QAbstractTableModel):
         self.__entries = entries
         self.columns = sorted(list(vars(Entry()).keys()))
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QtCore.QModelIndex()):
         return len(self.columns)
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.__entries)
 
     def data(self, index, role):
@@ -265,7 +265,11 @@ class EntryListModel(QtCore.QAbstractTableModel):
 
         for i in range(rows):
             obj = self.__entries[position]
-            self.__entries.remove(obj)
+            if obj.entry_id:
+                index = self.__entries.index(obj)
+                self.parent().journal.to_delete.append(self.__entries.pop(index))
+            else:
+                self.__entries.remove(obj)
 
         self.endRemoveRows()
         return True
@@ -316,6 +320,11 @@ class EntryList(QtWidgets.QDockWidget):
                                                statusTip='Create a new entry for this date',
                                                triggered=self.parent().new_entry)
 
+        self.act_delete_entry = QtWidgets.QAction('&Delete',
+                                                  self,
+                                                  statusTip='Delete the selected entry',
+                                                  triggered=self.parent().delete_entry)
+
     def initToolbars(self):
         self.toolbar.setIconSize(QtCore.QSize(24, 24))
         # self.toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
@@ -326,6 +335,7 @@ class EntryList(QtWidgets.QDockWidget):
         # right_spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.toolbar.addAction(self.act_new_entry)
+        self.toolbar.addAction(self.act_delete_entry)
         # self.toolbar.addWidget(left_spacer)
 
     def reset(self):
@@ -431,9 +441,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def initModels(self):
         self.entrymodel = EntryListModel(self.journal.entries, self)
+
         self.entryproxy = EntryFilterProxy(self)
         self.entryproxy.setDynamicSortFilter(True)
-        self.entrymodel.rowsInserted.connect(self.dock_entrylist.entrylist.setCurrentIndex)
+        self.entryproxy.setSourceModel(self.entrymodel)
+        self.entryproxy.setFilterKeyColumn(self.entrymodel.columns.index('date_published'))
 
         self.entrymapper = QtWidgets.QDataWidgetMapper(self)
         self.entrymapper.setModel(self.entryproxy)
@@ -442,17 +454,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.entrymapper.addMapping(self.main_entry.entry_editpage.bodytext,
                                     self.entrymodel.columns.index('body'))
 
-        self.entryproxy.setSourceModel(self.entrymodel)
-        self.entryproxy.setFilterKeyColumn(self.entrymodel.columns.index('date_published'))
-
         self.dock_calendar.calendar.selectionChanged.connect(self.filterDates)
 
         self.dock_entrylist.entrylist.setModel(self.entryproxy)
         self.dock_entrylist.entrylist.setModelColumn(self.entrymodel.columns.index('title'))
-        self.main_entry.setEnabled(True)
         self.dock_entrylist.entrylist.clicked.connect(self.entrymapper.setCurrentModelIndex)
-
-        self.entrymapper.toLast()
 
     def initStatusBar(self):
         self.main_statusbar = QtWidgets.QStatusBar(self)
@@ -462,9 +468,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatusBar(self.main_statusbar)
 
     def new_entry(self):
-        self.entrymodel.insertRows(len(self.journal.entries), 1)
-        # self.entrymapper.toLast()
-        # self.dock_entrylist.entrylist.setCurrentIndex(len(self.journal.entries))
+        newrow = self.entrymodel.rowCount()
+        self.entrymodel.insertRows(newrow, 1)
+        newindex = self.entryproxy.mapFromSource(self.entrymodel.index(newrow,
+                                                 self.entrymodel.columns.index('title')))
+        self.dock_entrylist.entrylist.setCurrentIndex(newindex)
+        self.entrymapper.setCurrentModelIndex(newindex)
+
+    def delete_entry(self):
+        index = self.dock_entrylist.entrylist.currentIndex().row()
+        self.entrymodel.removeRows(index, 1)
 
     def new_journal(self):
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Create New Journal')
