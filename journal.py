@@ -32,6 +32,7 @@ class Journal(object):
     def __init__(self, config=dict()):
         self.config = config
         self.entries = list()
+        self.deleted = list()
         self.current_entry = None
 
     def new(self, filename):
