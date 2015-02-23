@@ -251,7 +251,7 @@ class EntryListModel(QtCore.QAbstractTableModel):
             return True
         return False
 
-    def insertRows(self, position, rows, obj=Entry(), parent=QtCore.QModelIndex()):
+    def insertRows(self, position, rows, parent=QtCore.QModelIndex(), obj=Entry()):
         self.beginInsertRows(parent, position, position + rows - 1)
 
         for i in range(rows):
@@ -272,6 +272,16 @@ class EntryListModel(QtCore.QAbstractTableModel):
 
     def flags(self, index):
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+
+
+class EntryFilterProxy(QtCore.QSortFilterProxyModel):
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        index = self.sourceModel().index(sourceRow, self.filterKeyColumn(), sourceParent)
+        data = self.sourceModel().data(index, role=QtCore.Qt.DisplayRole)
+
+        print(data)
+
+        return (self.filterRegExp().indexIn(data.strftime('%Y-%m-%d')) >= 0)
 
 
 class EntryList(QtWidgets.QDockWidget):
@@ -424,10 +434,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def initModels(self):
         self.entrymodel = EntryListModel(self.journal.entries, self)
-        self.entryproxy = QtCore.QSortFilterProxyModel(self)
+        self.entryproxy = EntryFilterProxy(self)
+        self.entryproxy.setDynamicSortFilter(True)
 
         self.entrymapper = QtWidgets.QDataWidgetMapper(self)
-        self.entrymapper.setModel(self.entrymodel)
+        self.entrymapper.setModel(self.entryproxy)
         self.entrymapper.addMapping(self.main_entry.entry_editpage.titletext,
                                     self.entrymodel.columns.index('title'))
         self.entrymapper.addMapping(self.main_entry.entry_editpage.bodytext,
@@ -436,9 +447,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.entryproxy.setSourceModel(self.entrymodel)
         self.entryproxy.setFilterKeyColumn(self.entrymodel.columns.index('date_published'))
 
-        self.dock_calendar.calendar.selectionChanged.connect(self.entryproxy.setFilterWildcard)
+        self.dock_calendar.calendar.selectionChanged.connect(self.filterDates)
 
-        self.dock_entrylist.entrylist.setModel(self.entrymodel)
+        self.dock_entrylist.entrylist.setModel(self.entryproxy)
         self.dock_entrylist.entrylist.setModelColumn(self.entrymodel.columns.index('title'))
         self.main_entry.setEnabled(True)
         self.dock_entrylist.entrylist.clicked.connect(self.entrymapper.setCurrentModelIndex)
@@ -453,8 +464,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatusBar(self.main_statusbar)
 
     def new_entry(self):
-        self.entrymodel.insertRows(len(self.journal.entries), 1)
-        self.dock_entrylist.entrylist.setCurrentIndex(len(self.journal.entries))
+        self.entryproxy.insertRows(len(self.journal.entries), 1)
+        # self.dock_entrylist.entrylist.setCurrentIndex(len(self.journal.entries))
 
     def new_journal(self):
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Create New Journal')
@@ -484,6 +495,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_journal(self):
         self.journal.save()
+
+    def filterDates(self):
+        self.entryproxy.setFilterRegExp(self.dock_calendar.calendar.selectedDate().toString(QtCore.Qt.ISODate))
 
 
 if __name__ == '__main__':
