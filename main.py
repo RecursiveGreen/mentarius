@@ -251,11 +251,11 @@ class EntryListModel(QtCore.QAbstractTableModel):
             return True
         return False
 
-    def insertRows(self, position, rows, parent=QtCore.QModelIndex(), obj=Entry()):
+    def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
         self.beginInsertRows(parent, position, position + rows - 1)
 
         for i in range(rows):
-            self.__entries.insert(position, obj)
+            self.__entries.insert(position, Entry(date_published=self.parent().dock_calendar.calendar.selectedDate().toPyDate()))
 
         self.endInsertRows()
         return True
@@ -278,9 +278,6 @@ class EntryFilterProxy(QtCore.QSortFilterProxyModel):
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow, self.filterKeyColumn(), sourceParent)
         data = self.sourceModel().data(index, role=QtCore.Qt.DisplayRole)
-
-        print(data)
-
         return (self.filterRegExp().indexIn(data.strftime('%Y-%m-%d')) >= 0)
 
 
@@ -436,6 +433,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.entrymodel = EntryListModel(self.journal.entries, self)
         self.entryproxy = EntryFilterProxy(self)
         self.entryproxy.setDynamicSortFilter(True)
+        self.entrymodel.rowsInserted.connect(self.dock_entrylist.entrylist.setCurrentIndex)
 
         self.entrymapper = QtWidgets.QDataWidgetMapper(self)
         self.entrymapper.setModel(self.entryproxy)
@@ -464,7 +462,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatusBar(self.main_statusbar)
 
     def new_entry(self):
-        self.entryproxy.insertRows(len(self.journal.entries), 1)
+        self.entrymodel.insertRows(len(self.journal.entries), 1)
+        # self.entrymapper.toLast()
         # self.dock_entrylist.entrylist.setCurrentIndex(len(self.journal.entries))
 
     def new_journal(self):
