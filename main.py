@@ -104,7 +104,8 @@ class EntryWidget(QtWidgets.QWidget):
         # self.toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
         spacer = QtWidgets.QWidget()
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                             QtWidgets.QSizePolicy.Expanding)
 
         self.toolbar.addAction(self.act_edit)
         self.toolbar.addAction(self.act_view)
@@ -152,13 +153,17 @@ class EntryCalendar(QtWidgets.QDockWidget):
         self.toolbar = QtWidgets.QToolBar()
         self.calendar = QtWidgets.QCalendarWidget(self.dock_widget)
 
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                                           QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.calendar.sizePolicy().hasHeightForWidth())
         self.calendar.setSizePolicy(sizePolicy)
 
-        spacer = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        spacer = QtWidgets.QSpacerItem(0,
+                                       0,
+                                       QtWidgets.QSizePolicy.MinimumExpanding,
+                                       QtWidgets.QSizePolicy.MinimumExpanding)
 
         self.dock_widget_layout.addWidget(self.toolbar)
         self.dock_widget_layout.addWidget(self.calendar)
@@ -196,9 +201,11 @@ class EntryCalendar(QtWidgets.QDockWidget):
         # self.toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
         left_spacer = QtWidgets.QWidget()
-        left_spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        left_spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                                  QtWidgets.QSizePolicy.Expanding)
         right_spacer = QtWidgets.QWidget()
-        right_spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        right_spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
 
         self.toolbar.addAction(self.act_previous_entry)
         self.toolbar.addWidget(left_spacer)
@@ -270,8 +277,10 @@ class EntryListModel(QtCore.QAbstractTableModel):
     def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
         self.beginInsertRows(parent, position, position + rows - 1)
 
+        sel_date = self.parent().dock_calendar.calendar.selectedDate().toPyDate()
+
         for i in range(rows):
-            self.__entries.insert(position, Entry(date_published=self.parent().dock_calendar.calendar.selectedDate().toPyDate()))
+            self.__entries.insert(position, Entry(date_published=sel_date))
 
         self.endInsertRows()
         return True
@@ -296,7 +305,9 @@ class EntryListModel(QtCore.QAbstractTableModel):
 
 class EntryFilterProxy(QtCore.QSortFilterProxyModel):
     def filterAcceptsRow(self, sourceRow, sourceParent):
-        index = self.sourceModel().index(sourceRow, self.filterKeyColumn(), sourceParent)
+        index = self.sourceModel().index(sourceRow,
+                                         self.filterKeyColumn(),
+                                         sourceParent)
         data = self.sourceModel().data(index, role=QtCore.Qt.DisplayRole)
         return (self.filterRegExp().indexIn(data.strftime('%Y-%m-%d')) >= 0)
 
@@ -315,7 +326,8 @@ class EntryList(QtWidgets.QDockWidget):
         self.toolbar = QtWidgets.QToolBar()
 
         self.entrylist = QtWidgets.QListView(self.dock_widget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                                           QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.entrylist.sizePolicy().hasHeightForWidth())
@@ -461,22 +473,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.entrymodel.rowsMoved.connect(self.dock_calendar.showEntries)
         self.entrymodel.rowsRemoved.connect(self.dock_calendar.showEntries)
 
+        bodycol = self.entrymodel.columns.index('body')
+        titlecol = self.entrymodel.columns.index('title')
+        datepubcol = self.entrymodel.columns.index('date_published')
+
         self.entryproxy = EntryFilterProxy(self)
         self.entryproxy.setDynamicSortFilter(True)
         self.entryproxy.setSourceModel(self.entrymodel)
-        self.entryproxy.setFilterKeyColumn(self.entrymodel.columns.index('date_published'))
+        self.entryproxy.setFilterKeyColumn(datepubcol)
 
         self.entrymapper = QtWidgets.QDataWidgetMapper(self)
         self.entrymapper.setModel(self.entryproxy)
         self.entrymapper.addMapping(self.main_entry.entry_editpage.titletext,
-                                    self.entrymodel.columns.index('title'))
+                                    titlecol)
         self.entrymapper.addMapping(self.main_entry.entry_editpage.bodytext,
-                                    self.entrymodel.columns.index('body'))
+                                    bodycol)
 
         self.dock_calendar.calendar.selectionChanged.connect(self.filterDates)
 
         self.dock_entrylist.entrylist.setModel(self.entryproxy)
-        self.dock_entrylist.entrylist.setModelColumn(self.entrymodel.columns.index('title'))
+        self.dock_entrylist.entrylist.setModelColumn(titlecol)
         self.dock_entrylist.entrylist.clicked.connect(self.entrymapper.setCurrentModelIndex)
 
     def initStatusBar(self):
@@ -488,9 +504,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def new_entry(self):
         newrow = self.entrymodel.rowCount()
+        titlecol = self.entrymodel.columns.index('title')
         self.entrymodel.insertRows(newrow, 1)
         newindex = self.entryproxy.mapFromSource(self.entrymodel.index(newrow,
-                                                                       self.entrymodel.columns.index('title')))
+                                                                       titlecol))
         self.dock_entrylist.entrylist.setCurrentIndex(newindex)
         self.entrymapper.setCurrentModelIndex(newindex)
 
@@ -500,7 +517,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.entrymapper.setCurrentModelIndex(self.dock_entrylist.entrylist.currentIndex())
 
     def new_journal(self):
-        filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Create New Journal')
+        filename, _ = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                            'Create New Journal')
 
         if not filename:
             return
@@ -512,7 +530,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.resetAll()
 
     def open_journal(self):
-        filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Open Journal','.','(*.mentdb)')
+        filename, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                            'Open Journal',
+                                                            '.',
+                                                            '(*.mentdb)')
 
         if not filename:
             return
@@ -530,7 +551,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.journal.save()
 
     def filterDates(self):
-        self.entryproxy.setFilterRegExp(self.dock_calendar.calendar.selectedDate().toString(QtCore.Qt.ISODate))
+        sel_date = self.dock_calendar.calendar.selectedDate()
+        self.entryproxy.setFilterRegExp(sel_date.toString(QtCore.Qt.ISODate))
 
 
 if __name__ == '__main__':
