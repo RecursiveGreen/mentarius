@@ -221,6 +221,19 @@ class EntryCalendar(QtWidgets.QDockWidget):
     def today(self):
         self.calendar.setSelectedDate(QtCore.QDate.currentDate())
 
+    @QtCore.pyqtSlot()
+    def showEntries(self):
+        pubdates = self.parent().journal.publishedDateList(self.calendar.monthShown(),
+                                                           self.calendar.yearShown())
+        self.calendar.setDateTextFormat(QtCore.QDate(), QtGui.QTextCharFormat())
+
+        dateformat = QtGui.QTextCharFormat()
+        dateformat.setFontWeight(QtGui.QFont.Bold)
+
+        for d in pubdates:
+            pub = QtCore.QDate(d.year, d.month, d.day)
+            self.calendar.setDateTextFormat(pub, dateformat)
+
 
 class EntryListModel(QtCore.QAbstractTableModel):
     def __init__(self, entries=[], parent=None):
@@ -441,6 +454,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def initModels(self):
         self.entrymodel = EntryListModel(self.journal.entries, self)
+        self.entrymodel.rowsInserted.connect(self.dock_calendar.showEntries)
+        self.entrymodel.rowsMoved.connect(self.dock_calendar.showEntries)
+        self.entrymodel.rowsRemoved.connect(self.dock_calendar.showEntries)
 
         self.entryproxy = EntryFilterProxy(self)
         self.entryproxy.setDynamicSortFilter(True)
@@ -499,6 +515,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.journal.load(filename)
         self.initModels()
+        self.dock_calendar.showEntries()
 
     def resetAll(self):
         self.main_entry.reset()

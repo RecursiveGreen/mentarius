@@ -50,6 +50,14 @@ class Journal(object):
         modified_entries = [x for x in self.entries if x.modified]
         s.save(self.config['filename'], modified_entries, self.to_delete)
 
+    def publishedDateList(self,
+                          month=datetime.date.today().month,
+                          year=datetime.date.today().year):
+        pub = [x.date_published
+               for x in self.entries
+               if x.date_published.month == month and x.date_published.year == year]
+        return list(set(pub))
+
 
 # recordedip = [x['value']
 #              for x in ipdata.json()['data']
