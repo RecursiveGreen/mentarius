@@ -131,6 +131,7 @@ class EntryWidget(QtWidgets.QWidget):
     def updateViewer(self):
         title = self.entry_editpage.titletext.text()
         text = self.entry_editpage.bodytext.toPlainText()
+        print(text)
         # self.entry_viewpage.viewer.setHtml(text, self.baseUrl)
         self.entry_viewpage.viewer.setHtml('<h1>{0}</h1><p>{1}</p>'.format(title, text))
 
@@ -487,13 +488,14 @@ class MainWindow(QtWidgets.QMainWindow):
         newrow = self.entrymodel.rowCount()
         self.entrymodel.insertRows(newrow, 1)
         newindex = self.entryproxy.mapFromSource(self.entrymodel.index(newrow,
-                                                 self.entrymodel.columns.index('title')))
+                                                                       self.entrymodel.columns.index('title')))
         self.dock_entrylist.entrylist.setCurrentIndex(newindex)
         self.entrymapper.setCurrentModelIndex(newindex)
 
     def delete_entry(self):
-        index = self.dock_entrylist.entrylist.currentIndex().row()
-        self.entrymodel.removeRows(index, 1)
+        index = self.entryproxy.mapToSource(self.dock_entrylist.entrylist.currentIndex())
+        self.entrymodel.removeRows(index.row(), 1)
+        self.entrymapper.setCurrentModelIndex(self.dock_entrylist.entrylist.currentIndex())
 
     def new_journal(self):
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Create New Journal')
@@ -552,11 +554,3 @@ if __name__ == '__main__':
 #        self.action_editentry.setToolTip(_translate("main_window", "Changes the mode to edit your journal entries"))
 #        self.action_viewentry.setText(_translate("main_window", "View Entry"))
 #        self.action_viewentry.setToolTip(_translate("main_window", "Changes the mode to view your journal entries"))
-
-
-# mayFirst = QDate(self.calendar.yearShown(), 5, 1)
-
-#            mayFirstFormat = QTextCharFormat()
-#             mayFirstFormat.setForeground(Qt.red)
-
-#            self.calendar.setDateTextFormat(mayFirst, mayFirstFormat)
