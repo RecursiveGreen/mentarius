@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import html
 import sqlite3
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebKitWidgets
@@ -130,10 +131,11 @@ class EntryWidget(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def updateViewer(self):
         title = self.entry_editpage.titletext.text()
-        text = self.entry_editpage.bodytext.toPlainText()
-        print(text)
+        text = html.escape(self.entry_editpage.bodytext.toPlainText(), quote=True).replace('\n','<br />')
+
         # self.entry_viewpage.viewer.setHtml(text, self.baseUrl)
-        self.entry_viewpage.viewer.setHtml('<h1>{0}</h1><p>{1}</p>'.format(title, text))
+        self.entry_viewpage.viewer.setHtml('<h1>{0}</h1><p>{1}</p>'.format(title,
+                                                                           text))
 
 class EntryCalendar(QtWidgets.QDockWidget):
     def __init__(self, parent=None):
