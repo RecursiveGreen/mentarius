@@ -5,7 +5,7 @@ import datetime
 import html
 import sqlite3
 
-from PyQt5 import QtCore, QtGui, QtWidgets, QtWebKitWidgets
+from PyQt5 import QtCore, QtGui, QtPrintSupport, QtWidgets, QtWebKitWidgets
 import mentarius_rc
 
 from journal import Entry, Journal
@@ -20,19 +20,162 @@ class EntryEdit(QtWidgets.QWidget):
         self.edit_layout.setObjectName("edit_layout")
         self.edit_layout.setContentsMargins(0, 0, 0, 0)
 
+        self.optToolbar = QtWidgets.QToolBar(self)
+        self.edit_layout.addWidget(self.optToolbar, 0, 0, 1, 2)
+
+        self.formToolbar = QtWidgets.QToolBar(self)
+        self.edit_layout.addWidget(self.formToolbar, 1, 0, 1, 2)
+
         self.titlelabel = QtWidgets.QLabel(self)
         self.titlelabel.setObjectName("entry_titlelabel")
         self.titlelabel.setText("Title:")
-        self.edit_layout.addWidget(self.titlelabel, 0, 0, 1, 1)
+        self.edit_layout.addWidget(self.titlelabel, 2, 0, 1, 1)
 
         self.titletext = QtWidgets.QLineEdit(self)
         self.titletext.setObjectName("entry_titletext")
         self.titletext.setMaxLength(255)
-        self.edit_layout.addWidget(self.titletext, 0, 1, 1, 1)
+        self.edit_layout.addWidget(self.titletext, 2, 1, 1, 1)
 
-        self.bodytext = QtWidgets.QPlainTextEdit(self)
+        self.bodytext = QtWidgets.QTextEdit(self)
         self.bodytext.setObjectName("entry_bodytext")
-        self.edit_layout.addWidget(self.bodytext, 1, 0, 1, 2)
+        self.edit_layout.addWidget(self.bodytext, 3, 0, 1, 2)
+
+        self.initActions()
+        self.initToolbars()
+
+    def initActions(self):
+        self.act_bullet = QtWidgets.QAction('&Bullet List',
+                                            self,
+                                            shortcut='Ctrl+Shift+B',
+                                            statusTip='Insert bullet list into entry',
+                                            triggered=self.bulletList)
+
+        self.act_cut = QtWidgets.QAction('C&ut',
+                                         self,
+                                         shortcut='Ctrl+X',
+                                         statusTip='Move selected text to clipboard',
+                                         triggered=self.bodytext.cut)
+
+        self.act_copy = QtWidgets.QAction('C&opy',
+                                          self,
+                                          shortcut='Ctrl+C',
+                                          statusTip='Copy selected text to clipboard',
+                                          triggered=self.bodytext.copy)
+
+        self.act_fontback = QtWidgets.QAction('Back&ground Color',
+                                              self,
+                                              statusTip='Change background color',
+                                              triggered=self.changeFontBack)
+
+        self.act_fontfront = QtWidgets.QAction('&Font Color',
+                                               self,
+                                               statusTip='Change font color',
+                                               triggered=self.changeFontFront)
+
+        self.act_number = QtWidgets.QAction('&Numbered List',
+                                            self,
+                                            shortcut='Ctrl+Shift+L',
+                                            statusTip='Insert numbered list into entry',
+                                            triggered=self.numberedList)
+
+        self.act_paste = QtWidgets.QAction('P&aste',
+                                           self,
+                                           shortcut='Ctrl+V',
+                                           statusTip='Paste text from clipboard',
+                                           triggered=self.bodytext.paste)
+
+        self.act_preview = QtWidgets.QAction('&Print Preview',
+                                             self,
+                                             shortcut='Ctrl+Shift+P',
+                                             statusTip='Preview the current entry before printing',
+                                             triggered=self.printPreviewEntry)
+
+        self.act_print = QtWidgets.QAction('&Print',
+                                           self,
+                                           shortcut='Ctrl+P',
+                                           statusTip='Prints the current entry',
+                                           triggered=self.printEntry)
+
+        self.act_undo = QtWidgets.QAction('&Undo',
+                                           self,
+                                           shortcut='Ctrl+Z',
+                                           statusTip='Undo last action',
+                                           triggered=self.bodytext.undo)
+
+        self.act_redo = QtWidgets.QAction('&Redo',
+                                           self,
+                                           shortcut='Ctrl+Y',
+                                           statusTip='Redo actions undone',
+                                           triggered=self.bodytext.redo)
+
+    def initToolbars(self):
+        self.optToolbar.setIconSize(QtCore.QSize(24, 24))
+
+        self.optToolbar.addAction(self.act_print)
+        self.optToolbar.addAction(self.act_preview)
+        self.optToolbar.addSeparator()
+        self.optToolbar.addAction(self.act_cut)
+        self.optToolbar.addAction(self.act_copy)
+        self.optToolbar.addAction(self.act_paste)
+        self.optToolbar.addAction(self.act_undo)
+        self.optToolbar.addAction(self.act_redo)
+        self.optToolbar.addSeparator()
+        self.optToolbar.addAction(self.act_bullet)
+        self.optToolbar.addAction(self.act_number)
+
+        self.formToolbar.setIconSize(QtCore.QSize(24, 24))
+
+        self.fontname = QtWidgets.QFontComboBox(self)
+        self.fontname.currentFontChanged.connect(self.changeFont)
+
+        self.fontsize = QtWidgets.QComboBox(self)
+        self.fontsize.setEditable(True)
+        self.fontsize.setMinimumContentsLength(3)
+        self.fontsize.activated.connect(self.changeFontSize)
+        default_sizes = ['6','7','8','9','10','11','12','13','14','15','16',
+                         '18','20','22','24','26','28','32','36','40','44','48',
+                         '54','60','66','72','80','88','96']
+        for s in default_sizes:
+            self.fontsize.addItem(s)
+
+        self.formToolbar.addWidget(self.fontname)
+        self.formToolbar.addWidget(self.fontsize)
+        self.formToolbar.addSeparator()
+        self.formToolbar.addAction(self.act_fontfront)
+        self.formToolbar.addAction(self.act_fontback)
+
+    def changeFont(self, font):
+        self.bodytext.setCurrentFont(font)
+
+    def changeFontBack(self):
+        color = QtWidgets.QColorDialog.getColor()
+        self.bodytext.setTextBackgroundColor(color)
+
+    def changeFontFront(self):
+        color = QtWidgets.QColorDialog.getColor()
+        self.bodytext.setTextColor(color)
+
+    def changeFontSize(self, fontsize):
+        self.bodytext.setFontPointSize(int(fontsize))
+
+    def bulletList(self):
+        cursor = self.bodytext.textCursor()
+        cursor.insertList(QtGui.QTextListFormat.ListDisc)
+
+    def numberedList(self):
+        cursor = self.bodytext.textCursor()
+        cursor.insertList(QtGui.QTextListFormat.ListDecimal)
+
+    def printEntry(self):
+        dialog = QtPrintSupport.QPrintDialog()
+
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.bodytext.document().print_(dialog.printer())
+
+    def printPreviewEntry(self):
+        preview = QtPrintSupport.QPrintPreviewDialog()
+        preview.paintRequested.connect(lambda p: self.bodytext.print_(p))
+        preview.exec_()
 
 
 class EntryView(QtWidgets.QWidget):
@@ -377,7 +520,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setObjectName("main_window")
         self.setWindowTitle('Mentarius')
-        self.resize(800, 600)
+        self.resize(1027, 768)
 
         self.main_widget = QtWidgets.QWidget(self)
         self.main_widget.setObjectName("main_widget")
