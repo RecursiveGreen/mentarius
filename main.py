@@ -140,20 +140,6 @@ class EntryEdit(QtWidgets.QWidget):
                                            statusTip='Paste text from clipboard',
                                            triggered=self.bodytext.paste)
 
-        self.act_preview = QtWidgets.QAction(QtGui.QIcon(':/entry-printpreview'),
-                                             '&Print Preview',
-                                             self,
-                                             shortcut='Ctrl+Shift+P',
-                                             statusTip='Preview the current entry before printing',
-                                             triggered=self.printPreviewEntry)
-
-        self.act_print = QtWidgets.QAction(QtGui.QIcon(':/entry-print'),
-                                           '&Print',
-                                           self,
-                                           shortcut='Ctrl+P',
-                                           statusTip='Prints the current entry',
-                                           triggered=self.printEntry)
-
         self.act_strike = QtWidgets.QAction(QtGui.QIcon(':/font-strike'),
                                             '&Strikethrough',
                                             self,
@@ -196,9 +182,6 @@ class EntryEdit(QtWidgets.QWidget):
     def initToolbars(self):
         self.optToolbar.setIconSize(QtCore.QSize(24, 24))
 
-        self.optToolbar.addAction(self.act_print)
-        self.optToolbar.addAction(self.act_preview)
-        self.optToolbar.addSeparator()
         self.optToolbar.addAction(self.act_cut)
         self.optToolbar.addAction(self.act_copy)
         self.optToolbar.addAction(self.act_paste)
@@ -251,17 +234,6 @@ class EntryEdit(QtWidgets.QWidget):
     def numberedList(self):
         cursor = self.bodytext.textCursor()
         cursor.insertList(QtGui.QTextListFormat.ListDecimal)
-
-    def printEntry(self):
-        dialog = QtPrintSupport.QPrintDialog()
-
-        if dialog.exec_() == QtWidgets.QDialog.Accepted:
-            self.bodytext.document().print_(dialog.printer())
-
-    def printPreviewEntry(self):
-        preview = QtPrintSupport.QPrintPreviewDialog()
-        preview.paintRequested.connect(lambda p: self.bodytext.print_(p))
-        preview.exec_()
 
     def changeFont(self, font):
         self.bodytext.setCurrentFont(font)
@@ -434,6 +406,20 @@ class EntryWidget(QtWidgets.QWidget):
                                           triggered=self.toggleEntry)
         self.act_edit.setVisible(False)
 
+        self.act_preview = QtWidgets.QAction(QtGui.QIcon(':/entry-printpreview'),
+                                             '&Print Preview',
+                                             self,
+                                             shortcut='Ctrl+Shift+P',
+                                             statusTip='Preview the current entry before printing',
+                                             triggered=self.printPreviewEntry)
+
+        self.act_print = QtWidgets.QAction(QtGui.QIcon(':/entry-print'),
+                                           '&Print',
+                                           self,
+                                           shortcut='Ctrl+P',
+                                           statusTip='Prints the current entry',
+                                           triggered=self.printEntry)
+
         self.act_view = QtWidgets.QAction(QtGui.QIcon(':/entry-view'),
                                           '&Preview Entry',
                                           self,
@@ -455,6 +441,19 @@ class EntryWidget(QtWidgets.QWidget):
         self.toolbar.addAction(self.act_view)
         self.toolbar.addSeparator()
         self.toolbar.addWidget(spacer)
+        self.toolbar.addAction(self.act_print)
+        self.toolbar.addAction(self.act_preview)
+
+    def printEntry(self):
+        dialog = QtPrintSupport.QPrintDialog()
+
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.entry_viewpage.viewer.print_(dialog.printer())
+
+    def printPreviewEntry(self):
+        preview = QtPrintSupport.QPrintPreviewDialog()
+        preview.paintRequested.connect(lambda p: self.entry_viewpage.viewer.print_(p))
+        preview.exec_()
 
     def reset(self):
         self.entry_editpage.titletext.clear()
