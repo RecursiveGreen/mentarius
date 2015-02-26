@@ -194,6 +194,7 @@ class EntryEdit(QtWidgets.QWidget):
         self.formToolbar.setIconSize(QtCore.QSize(24, 24))
 
         self.fontname = QtWidgets.QFontComboBox(self)
+        self.fontname.setEditable(False)
         self.fontname.currentFontChanged.connect(self.changeFont)
 
         self.fontsize = QtWidgets.QComboBox(self)
@@ -722,7 +723,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setObjectName("main_window")
         self.setWindowTitle('Mentarius')
-        self.resize(1027, 768)
+        self.resize(1200, 800)
 
         self.main_widget = QtWidgets.QWidget(self)
         self.main_widget.setObjectName("main_widget")
