@@ -44,23 +44,49 @@ class EntryEdit(QtWidgets.QWidget):
         self.initToolbars()
 
     def initActions(self):
+        self.act_aligncenter = QtWidgets.QAction('Align Center',
+                                                 self,
+                                                 statusTip='Align text to center of entry',
+                                                 triggered=self.alignCenter)
+
+        self.act_alignjustify = QtWidgets.QAction('Align Justify',
+                                                  self,
+                                                  statusTip='Align text to justify the width of the entry',
+                                                  triggered=self.alignJustify)
+
+        self.act_alignleft = QtWidgets.QAction('Align Left',
+                                               self,
+                                               statusTip='Align text to left of entry',
+                                               triggered=self.alignLeft)
+
+        self.act_alignright = QtWidgets.QAction('Align Right',
+                                                self,
+                                                statusTip='Align text to right of entry',
+                                                triggered=self.alignRight)
+
+        self.act_bold = QtWidgets.QAction('&Bold',
+                                          self,
+                                          shortcut='Ctrl+B',
+                                          statusTip='Bold text',
+                                          triggered=self.bold)
+
         self.act_bullet = QtWidgets.QAction('&Bullet List',
                                             self,
                                             shortcut='Ctrl+Shift+B',
                                             statusTip='Insert bullet list into entry',
                                             triggered=self.bulletList)
 
-        self.act_cut = QtWidgets.QAction('C&ut',
-                                         self,
-                                         shortcut='Ctrl+X',
-                                         statusTip='Move selected text to clipboard',
-                                         triggered=self.bodytext.cut)
-
         self.act_copy = QtWidgets.QAction('C&opy',
                                           self,
                                           shortcut='Ctrl+C',
                                           statusTip='Copy selected text to clipboard',
                                           triggered=self.bodytext.copy)
+
+        self.act_cut = QtWidgets.QAction('C&ut',
+                                         self,
+                                         shortcut='Ctrl+X',
+                                         statusTip='Move selected text to clipboard',
+                                         triggered=self.bodytext.cut)
 
         self.act_fontback = QtWidgets.QAction('Back&ground Color',
                                               self,
@@ -71,6 +97,12 @@ class EntryEdit(QtWidgets.QWidget):
                                                self,
                                                statusTip='Change font color',
                                                triggered=self.changeFontFront)
+
+        self.act_italics = QtWidgets.QAction('&Italics',
+                                             self,
+                                             shortcut='Ctrl+I',
+                                             statusTip='Italics text',
+                                             triggered=self.italics)
 
         self.act_number = QtWidgets.QAction('&Numbered List',
                                             self,
@@ -95,6 +127,27 @@ class EntryEdit(QtWidgets.QWidget):
                                            shortcut='Ctrl+P',
                                            statusTip='Prints the current entry',
                                            triggered=self.printEntry)
+
+        self.act_strike = QtWidgets.QAction('&Strikethrough',
+                                            self,
+                                            statusTip='Strikethrough text',
+                                            triggered=self.strikethrough)
+
+        self.act_subscript = QtWidgets.QAction('&Subscript',
+                                            self,
+                                            statusTip='Subscript text',
+                                            triggered=self.subscript)
+
+        self.act_superscript = QtWidgets.QAction('&Superscript',
+                                            self,
+                                            statusTip='Superscript text',
+                                            triggered=self.superscript)
+
+        self.act_underline = QtWidgets.QAction('&Underline',
+                                               self,
+                                               shortcut='Ctrl+U',
+                                               statusTip='Underline text',
+                                               triggered=self.underline)
 
         self.act_undo = QtWidgets.QAction('&Undo',
                                            self,
@@ -143,20 +196,19 @@ class EntryEdit(QtWidgets.QWidget):
         self.formToolbar.addSeparator()
         self.formToolbar.addAction(self.act_fontfront)
         self.formToolbar.addAction(self.act_fontback)
-
-    def changeFont(self, font):
-        self.bodytext.setCurrentFont(font)
-
-    def changeFontBack(self):
-        color = QtWidgets.QColorDialog.getColor()
-        self.bodytext.setTextBackgroundColor(color)
-
-    def changeFontFront(self):
-        color = QtWidgets.QColorDialog.getColor()
-        self.bodytext.setTextColor(color)
-
-    def changeFontSize(self, fontsize):
-        self.bodytext.setFontPointSize(int(fontsize))
+        self.formToolbar.addSeparator()
+        self.formToolbar.addAction(self.act_bold)
+        self.formToolbar.addAction(self.act_italics)
+        self.formToolbar.addAction(self.act_underline)
+        self.formToolbar.addAction(self.act_strike)
+        self.formToolbar.addAction(self.act_subscript)
+        self.formToolbar.addAction(self.act_superscript)
+        self.formToolbar.addSeparator()
+        self.formToolbar.addAction(self.act_alignleft)
+        self.formToolbar.addAction(self.act_aligncenter)
+        self.formToolbar.addAction(self.act_alignright)
+        self.formToolbar.addAction(self.act_alignjustify)
+        self.formToolbar.addSeparator()
 
     def bulletList(self):
         cursor = self.bodytext.textCursor()
@@ -176,6 +228,73 @@ class EntryEdit(QtWidgets.QWidget):
         preview = QtPrintSupport.QPrintPreviewDialog()
         preview.paintRequested.connect(lambda p: self.bodytext.print_(p))
         preview.exec_()
+
+    def changeFont(self, font):
+        self.bodytext.setCurrentFont(font)
+
+    def changeFontBack(self):
+        color = QtWidgets.QColorDialog.getColor()
+        self.bodytext.setTextBackgroundColor(color)
+
+    def changeFontFront(self):
+        color = QtWidgets.QColorDialog.getColor()
+        self.bodytext.setTextColor(color)
+
+    def changeFontSize(self, fontsize):
+        self.bodytext.setFontPointSize(int(fontsize))
+
+    def bold(self):
+        if self.bodytext.fontWeight() == QtGui.QFont.Bold:
+            self.bodytext.setFontWeight(QtGui.QFont.Normal)
+        else:
+            self.bodytext.setFontWeight(QtGui.QFont.Bold)
+
+    def italics(self):
+        state = self.bodytext.fontItalic()
+        self.bodytext.setFontItalic(not state)
+
+    def underline(self):
+        state = self.bodytext.fontUnderline()
+        self.bodytext.setFontUnderline(not state)
+
+    def strikethrough(self):
+        textformat = self.bodytext.currentCharFormat()
+        textformat.setFontStrikeOut(not textformat.fontStrikeOut())
+        self.bodytext.setCurrentCharFormat(textformat)
+
+    def subscript(self):
+        textformat = self.bodytext.currentCharFormat()
+        align = textformat.verticalAlignment()
+
+        if align == QtGui.QTextCharFormat.AlignNormal:
+            textformat.setVerticalAlignment(QtGui.QTextCharFormat.AlignSubScript)
+        else:
+            textformat.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
+
+        self.bodytext.setCurrentCharFormat(textformat)
+
+    def superscript(self):
+        textformat = self.bodytext.currentCharFormat()
+        align = textformat.verticalAlignment()
+
+        if align == QtGui.QTextCharFormat.AlignNormal:
+            textformat.setVerticalAlignment(QtGui.QTextCharFormat.AlignSuperScript)
+        else:
+            textformat.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
+
+        self.bodytext.setCurrentCharFormat(textformat)
+
+    def alignCenter(self):
+        self.bodytext.setAlignment(QtCore.Qt.AlignCenter)
+
+    def alignJustify(self):
+        self.bodytext.setAlignment(QtCore.Qt.AlignJustify)
+
+    def alignLeft(self):
+        self.bodytext.setAlignment(QtCore.Qt.AlignLeft)
+
+    def alignRight(self):
+        self.bodytext.setAlignment(QtCore.Qt.AlignRight)
 
 
 class EntryView(QtWidgets.QWidget):
