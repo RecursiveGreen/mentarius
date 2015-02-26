@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import html
 import sqlite3
 
 from PyQt5 import QtCore, QtGui, QtPrintSupport, QtWidgets, QtWebKitWidgets
@@ -96,6 +95,12 @@ class EntryEdit(QtWidgets.QWidget):
                                          statusTip='Move selected text to clipboard',
                                          triggered=self.bodytext.cut)
 
+        self.act_dedent = QtWidgets.QAction(QtGui.QIcon(':/text-dedent'),
+                                            'Dedent',
+                                            self,
+                                            statusTip='Dedent text selection',
+                                            triggered=self.dedent)
+
         self.act_fontback = QtWidgets.QAction(QtGui.QIcon(':/color-back'),
                                               'Back&ground Color',
                                               self,
@@ -107,6 +112,12 @@ class EntryEdit(QtWidgets.QWidget):
                                                self,
                                                statusTip='Change font color',
                                                triggered=self.changeFontFront)
+
+        self.act_indent = QtWidgets.QAction(QtGui.QIcon(':/text-indent'),
+                                            'Indent',
+                                            self,
+                                            statusTip='Indent text selection',
+                                            triggered=self.indent)
 
         self.act_italics = QtWidgets.QAction(QtGui.QIcon(':/font-italics'),
                                              '&Italics',
@@ -230,6 +241,8 @@ class EntryEdit(QtWidgets.QWidget):
         self.formToolbar.addAction(self.act_alignright)
         self.formToolbar.addAction(self.act_alignjustify)
         self.formToolbar.addSeparator()
+        self.formToolbar.addAction(self.act_indent)
+        self.formToolbar.addAction(self.act_dedent)
 
     def bulletList(self):
         cursor = self.bodytext.textCursor()
@@ -316,6 +329,54 @@ class EntryEdit(QtWidgets.QWidget):
 
     def alignRight(self):
         self.bodytext.setAlignment(QtCore.Qt.AlignRight)
+
+    def indent(self):
+        cursor = self.bodytext.textCursor()
+
+        if cursor.hasSelection():
+            temp = cursor.blockNumber()
+            cursor.setPosition(cursor.anchor())
+            diff = cursor.blockNumber() - temp
+            if diff > 0:
+                direction = QtGui.QTextCursor.Up
+            else:
+                direction = QtGui.QTextCursor.Down
+
+            for line in range(abs(diff) + 1):
+                cursor.movePosition(QtGui.QTextCursor.StartOfLine)
+                cursor.insertText('\t')
+                cursor.movePosition(direction)
+        else:
+            cursor.insertText('\t')
+
+    def handleDedent(self, cursor):
+        cursor.movePosition(QtGui.QTextCursor.StartOfLine)
+        line = cursor.block().text()
+        if line.startswith('\t'):
+            cursor.deleteChar()
+        else:
+            for char in line[:8]:
+                if char != ' ':
+                    break
+                cursor.deleteChar()
+
+    def dedent(self):
+        cursor = self.bodytext.textCursor()
+
+        if cursor.hasSelection():
+            temp = cursor.blockNumber()
+            cursor.setPosition(cursor.anchor())
+            diff = cursor.blockNumber() - temp
+            if diff > 0:
+                direction = QtGui.QTextCursor.Up
+            else:
+                direction = QtGui.QTextCursor.Down
+
+            for line in range(abs(diff) + 1):
+                self.handleDedent(cursor)
+                cursor.movePosition(direction)
+        else:
+            self.handleDedent(cursor)
 
 
 class EntryView(QtWidgets.QWidget):
@@ -415,11 +476,11 @@ class EntryWidget(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def updateViewer(self):
         title = self.entry_editpage.titletext.text()
-        text = html.escape(self.entry_editpage.bodytext.toPlainText(), quote=True).replace('\n','<br />')
+        text = self.entry_editpage.bodytext.toHtml()
 
         # self.entry_viewpage.viewer.setHtml(text, self.baseUrl)
-        self.entry_viewpage.viewer.setHtml('<h1>{0}</h1><p>{1}</p>'.format(title,
-                                                                           text))
+        self.entry_viewpage.viewer.setHtml('<h1>{0}</h1>{1}'.format(title,
+                                                                    text))
 
 class EntryCalendar(QtWidgets.QDockWidget):
     def __init__(self, parent=None):
