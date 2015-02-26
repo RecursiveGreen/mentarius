@@ -6,7 +6,7 @@ import html
 import sqlite3
 
 from PyQt5 import QtCore, QtGui, QtPrintSupport, QtWidgets, QtWebKitWidgets
-import mentarius_rc
+import icons
 
 from journal import Entry, Journal
 
@@ -44,122 +44,143 @@ class EntryEdit(QtWidgets.QWidget):
         self.initToolbars()
 
     def initActions(self):
-        self.act_aligncenter = QtWidgets.QAction('Align Center',
+        self.act_aligncenter = QtWidgets.QAction(QtGui.QIcon(':/align-center'),
+                                                 'Align Center',
                                                  self,
                                                  statusTip='Align text to center of entry',
                                                  triggered=self.alignCenter)
 
-        self.act_alignjustify = QtWidgets.QAction('Align Justify',
+        self.act_alignjustify = QtWidgets.QAction(QtGui.QIcon(':/align-justify'),
+                                                  'Align Justify',
                                                   self,
                                                   statusTip='Align text to justify the width of the entry',
                                                   triggered=self.alignJustify)
 
-        self.act_alignleft = QtWidgets.QAction('Align Left',
+        self.act_alignleft = QtWidgets.QAction(QtGui.QIcon(':/align-left'),
+                                               'Align Left',
                                                self,
                                                statusTip='Align text to left of entry',
                                                triggered=self.alignLeft)
 
-        self.act_alignright = QtWidgets.QAction('Align Right',
+        self.act_alignright = QtWidgets.QAction(QtGui.QIcon(':/align-right'),
+                                                'Align Right',
                                                 self,
                                                 statusTip='Align text to right of entry',
                                                 triggered=self.alignRight)
 
-        self.act_bold = QtWidgets.QAction('&Bold',
+        self.act_bold = QtWidgets.QAction(QtGui.QIcon(':/font-bold'),
+                                          '&Bold',
                                           self,
                                           shortcut='Ctrl+B',
                                           statusTip='Bold text',
                                           triggered=self.bold)
 
-        self.act_bullet = QtWidgets.QAction('&Bullet List',
+        self.act_bullet = QtWidgets.QAction(QtGui.QIcon(':/list-bullet'),
+                                            '&Bullet List',
                                             self,
                                             shortcut='Ctrl+Shift+B',
                                             statusTip='Insert bullet list into entry',
                                             triggered=self.bulletList)
 
-        self.act_copy = QtWidgets.QAction('C&opy',
+        self.act_copy = QtWidgets.QAction(QtGui.QIcon(':/text-copy'),
+                                          'C&opy',
                                           self,
                                           shortcut='Ctrl+C',
                                           statusTip='Copy selected text to clipboard',
                                           triggered=self.bodytext.copy)
 
-        self.act_cut = QtWidgets.QAction('C&ut',
+        self.act_cut = QtWidgets.QAction(QtGui.QIcon(':/text-cut'),
+                                         'C&ut',
                                          self,
                                          shortcut='Ctrl+X',
                                          statusTip='Move selected text to clipboard',
                                          triggered=self.bodytext.cut)
 
-        self.act_fontback = QtWidgets.QAction('Back&ground Color',
+        self.act_fontback = QtWidgets.QAction(QtGui.QIcon(':/color-back'),
+                                              'Back&ground Color',
                                               self,
                                               statusTip='Change background color',
                                               triggered=self.changeFontBack)
 
-        self.act_fontfront = QtWidgets.QAction('&Font Color',
+        self.act_fontfront = QtWidgets.QAction(QtGui.QIcon(':/color-front'),
+                                               '&Font Color',
                                                self,
                                                statusTip='Change font color',
                                                triggered=self.changeFontFront)
 
-        self.act_italics = QtWidgets.QAction('&Italics',
+        self.act_italics = QtWidgets.QAction(QtGui.QIcon(':/font-italics'),
+                                             '&Italics',
                                              self,
                                              shortcut='Ctrl+I',
                                              statusTip='Italics text',
                                              triggered=self.italics)
 
-        self.act_number = QtWidgets.QAction('&Numbered List',
+        self.act_number = QtWidgets.QAction(QtGui.QIcon(':/list-number'),
+                                            '&Numbered List',
                                             self,
                                             shortcut='Ctrl+Shift+L',
                                             statusTip='Insert numbered list into entry',
                                             triggered=self.numberedList)
 
-        self.act_paste = QtWidgets.QAction('P&aste',
+        self.act_paste = QtWidgets.QAction(QtGui.QIcon(':/text-paste'),
+                                           'P&aste',
                                            self,
                                            shortcut='Ctrl+V',
                                            statusTip='Paste text from clipboard',
                                            triggered=self.bodytext.paste)
 
-        self.act_preview = QtWidgets.QAction('&Print Preview',
+        self.act_preview = QtWidgets.QAction(QtGui.QIcon(':/entry-printpreview'),
+                                             '&Print Preview',
                                              self,
                                              shortcut='Ctrl+Shift+P',
                                              statusTip='Preview the current entry before printing',
                                              triggered=self.printPreviewEntry)
 
-        self.act_print = QtWidgets.QAction('&Print',
+        self.act_print = QtWidgets.QAction(QtGui.QIcon(':/entry-print'),
+                                           '&Print',
                                            self,
                                            shortcut='Ctrl+P',
                                            statusTip='Prints the current entry',
                                            triggered=self.printEntry)
 
-        self.act_strike = QtWidgets.QAction('&Strikethrough',
+        self.act_strike = QtWidgets.QAction(QtGui.QIcon(':/font-strike'),
+                                            '&Strikethrough',
                                             self,
                                             statusTip='Strikethrough text',
                                             triggered=self.strikethrough)
 
-        self.act_subscript = QtWidgets.QAction('&Subscript',
-                                            self,
-                                            statusTip='Subscript text',
-                                            triggered=self.subscript)
+        self.act_subscript = QtWidgets.QAction(QtGui.QIcon(':/font-subscript'),
+                                               '&Subscript',
+                                               self,
+                                               statusTip='Subscript text',
+                                               triggered=self.subscript)
 
-        self.act_superscript = QtWidgets.QAction('&Superscript',
-                                            self,
-                                            statusTip='Superscript text',
-                                            triggered=self.superscript)
+        self.act_superscript = QtWidgets.QAction(QtGui.QIcon(':/font-superscript'),
+                                                 '&Superscript',
+                                                 self,
+                                                 statusTip='Superscript text',
+                                                 triggered=self.superscript)
 
-        self.act_underline = QtWidgets.QAction('&Underline',
+        self.act_underline = QtWidgets.QAction(QtGui.QIcon(':/font-underline'),
+                                               '&Underline',
                                                self,
                                                shortcut='Ctrl+U',
                                                statusTip='Underline text',
                                                triggered=self.underline)
 
-        self.act_undo = QtWidgets.QAction('&Undo',
-                                           self,
-                                           shortcut='Ctrl+Z',
-                                           statusTip='Undo last action',
-                                           triggered=self.bodytext.undo)
+        self.act_undo = QtWidgets.QAction(QtGui.QIcon(':/text-undo'),
+                                          '&Undo',
+                                          self,
+                                          shortcut='Ctrl+Z',
+                                          statusTip='Undo last action',
+                                          triggered=self.bodytext.undo)
 
-        self.act_redo = QtWidgets.QAction('&Redo',
-                                           self,
-                                           shortcut='Ctrl+Y',
-                                           statusTip='Redo actions undone',
-                                           triggered=self.bodytext.redo)
+        self.act_redo = QtWidgets.QAction(QtGui.QIcon(':/text-redo'),
+                                          '&Redo',
+                                          self,
+                                          shortcut='Ctrl+Y',
+                                          statusTip='Redo actions undone',
+                                          triggered=self.bodytext.redo)
 
     def initToolbars(self):
         self.optToolbar.setIconSize(QtCore.QSize(24, 24))
@@ -345,14 +366,14 @@ class EntryWidget(QtWidgets.QWidget):
         self.reset()
 
     def initActions(self):
-        self.act_edit = QtWidgets.QAction(QtGui.QIcon(':/document-edit'),
+        self.act_edit = QtWidgets.QAction(QtGui.QIcon(':/entry-edit'),
                                           '&Edit Entry',
                                           self,
                                           statusTip='Changes the mode to edit your journal entries',
                                           triggered=self.toggleEntry)
         self.act_edit.setVisible(False)
 
-        self.act_view = QtWidgets.QAction(QtGui.QIcon(':/document-preview'),
+        self.act_view = QtWidgets.QAction(QtGui.QIcon(':/entry-view'),
                                           '&Preview Entry',
                                           self,
                                           statusTip='Preview the current journal entry',
@@ -440,19 +461,19 @@ class EntryCalendar(QtWidgets.QDockWidget):
         self.reset()
 
     def initActions(self):
-        self.act_previous_entry = QtWidgets.QAction(QtGui.QIcon(':/go-previous'),
+        self.act_previous_entry = QtWidgets.QAction(QtGui.QIcon(':/cal-previous'),
                                                     '&Previous Entry',
                                                     self,
                                                     statusTip='Go back to the previous journal entry',
                                                     triggered=self.prevEntry)
 
-        self.act_next_entry = QtWidgets.QAction(QtGui.QIcon(':/go-next'),
+        self.act_next_entry = QtWidgets.QAction(QtGui.QIcon(':/cal-next'),
                                                 '&Next Entry',
                                                 self,
                                                 statusTip='Go to the next journal journal entry',
                                                 triggered=self.nextEntry)
 
-        self.act_today = QtWidgets.QAction(QtGui.QIcon(':/go-jump-today'),
+        self.act_today = QtWidgets.QAction(QtGui.QIcon(':/cal-today'),
                                            '&Today',
                                            self,
                                            statusTip='Go to today\'s entry',
@@ -605,12 +626,14 @@ class EntryList(QtWidgets.QDockWidget):
         self.reset()
 
     def initActions(self):
-        self.act_new_entry = QtWidgets.QAction('&New',
+        self.act_new_entry = QtWidgets.QAction(QtGui.QIcon(':/entry-new'),
+                                               '&New',
                                                self,
                                                statusTip='Create a new entry for this date',
                                                triggered=self.parent().new_entry)
 
-        self.act_delete_entry = QtWidgets.QAction('&Delete',
+        self.act_delete_entry = QtWidgets.QAction(QtGui.QIcon(':/entry-remove'),
+                                                  '&Delete',
                                                   self,
                                                   statusTip='Delete the selected entry',
                                                   triggered=self.parent().delete_entry)
@@ -673,26 +696,29 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.action_exit.setIcon(icon)
         # self.action_exit.setObjectName("action_exit")
 
-        self.act_new = QtWidgets.QAction('&New',
+        self.act_new = QtWidgets.QAction(QtGui.QIcon(':/journal-new'),
+                                         '&New',
                                          self,
                                          shortcut='Ctrl+N',
                                          statusTip='New Journal',
                                          triggered=self.new_journal)
 
-        self.act_open = QtWidgets.QAction('&Open',
+        self.act_open = QtWidgets.QAction(QtGui.QIcon(':/journal-open'),
+                                          '&Open',
                                           self,
                                           shortcut='Ctrl+O',
                                           statusTip='Open Journal',
                                           triggered=self.open_journal)
 
-        self.act_quit = QtWidgets.QAction(QtGui.QIcon(':/application-exit'),
+        self.act_quit = QtWidgets.QAction(QtGui.QIcon(':/app-exit'),
                                           '&Quit',
                                           self,
                                           shortcut='Ctrl+Q',
                                           statusTip='Quit Mentarius',
                                           triggered=self.close)
 
-        self.act_save = QtWidgets.QAction('&Save',
+        self.act_save = QtWidgets.QAction(QtGui.QIcon(':/journal-save'),
+                                          '&Save',
                                           self,
                                           shortcut='Ctrl+S',
                                           statusTip='Save Journal',

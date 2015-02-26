@@ -1,13 +1,38 @@
 <RCC>
   <qresource prefix="/">
-    <file alias="document-edit">icons/scalable/actions/document-edit.svgz</file>
-    <file alias="go-previous">icons/scalable/actions/go-previous.svgz</file>
-    <file alias="go-next">icons/scalable/actions/go-next.svgz</file>
-    <file alias="document-save">icons/scalable/actions/document-save.svgz</file>
-    <file alias="application-exit">icons/scalable/actions/application-exit.svgz</file>
-    <file alias="chronometer">icons/scalable/actions/chronometer.svgz</file>
-    <file alias="go-home">icons/scalable/actions/go-home.svgz</file>
-    <file alias="document-preview">icons/scalable/actions/document-preview.svgz</file>
-    <file alias="go-jump-today">icons/scalable/actions/go-jump-today.svgz</file>
+    <file alias="app-exit">icons/0277-exit.svg</file>
+    <file alias="journal-new">icons/0032-book.svg</file>
+    <file alias="journal-open">icons/0049-folder-open.svg</file>
+    <file alias="journal-save">icons/0099-floppy-disk.svg</file>
+    <file alias="entry-edit">icons/0008-quill.svg</file>
+    <file alias="entry-view">icons/0207-eye.svg</file>
+    <file alias="cal-previous">icons/0313-arrow-left.svg</file>
+    <file alias="cal-today">icons/0084-calendar.svg</file>
+    <file alias="cal-next">icons/0309-arrow-right.svg</file>
+    <file alias="entry-new">icons/0267-plus.svg</file>
+    <file alias="entry-remove">icons/0268-minus.svg</file>
+    <file alias="entry-print">icons/0085-printer.svg</file>
+    <file alias="entry-printpreview">icons/0087-display.svg</file>
+    <file alias="text-cut">icons/0347-scissors.svg</file>
+    <file alias="text-copy">icons/0045-copy.svg</file>
+    <file alias="text-paste">icons/0185-clipboard.svg</file>
+    <file alias="text-undo">icons/0102-undo.svg</file>
+    <file alias="text-redo">icons/0103-redo.svg</file>
+    <file alias="list-bullet">icons/0188-list2.svg</file>
+    <file alias="list-number">icons/0186-list-numbered.svg</file>
+    <file alias="color-front">icons/0366-text-color.svg</file>
+    <file alias="color-back">icons/0013-paint-format.svg</file>
+    <file alias="font-bold">icons/0355-bold.svg</file>
+    <file alias="font-italics">icons/0357-italic.svg</file>
+    <file alias="font-underline">icons/0356-underline.svg</file>
+    <file alias="font-strike">icons/0358-strikethrough.svg</file>
+    <file alias="font-subscript">icons/0365-subscript2.svg</file>
+    <file alias="font-superscript">icons/0364-superscript2.svg</file>
+    <file alias="align-left">icons/0376-paragraph-left.svg</file>
+    <file alias="align-center">icons/0377-paragraph-center.svg</file>
+    <file alias="align-right">icons/0378-paragraph-right.svg</file>
+    <file alias="align-justify">icons/0379-paragraph-justify.svg</file>
+    <file alias="text-indent">icons/0380-indent-increase.svg</file>
+    <file alias="text-dedent">icons/0381-indent-decrease.svg</file>
   </qresource>
 </RCC>
