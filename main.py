@@ -757,6 +757,16 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.action_exit.setIcon(icon)
         # self.action_exit.setObjectName("action_exit")
 
+        self.act_about = QtWidgets.QAction('About',
+                                           self,
+                                           statusTip='About Mentarius',
+                                           triggered=self.about)
+
+        self.act_aboutQt = QtWidgets.QAction('About Qt',
+                                             self,
+                                             statusTip='About Qt',
+                                             triggered=self.aboutQt)
+
         self.act_new = QtWidgets.QAction(QtGui.QIcon(':/journal-new'),
                                          '&New',
                                          self,
@@ -811,8 +821,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menu_view.addAction(self.dock_calendar.toggleViewAction())
         self.menu_view.addAction(self.dock_entrylist.toggleViewAction())
 
+        self.menu_help = QtWidgets.QMenu(self.main_menubar)
+        self.menu_help.setObjectName("menu_help")
+        self.menu_help.setTitle("&Help")
+        self.menu_help.addAction(self.act_aboutQt)
+        self.menu_help.addAction(self.act_about)
+
         self.main_menubar.addMenu(self.menu_file)
         self.main_menubar.addMenu(self.menu_view)
+        self.main_menubar.addMenu(self.menu_help)
 
         self.setMenuBar(self.main_menubar)
 
@@ -850,6 +867,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_statusbar.showMessage("Ready.")
 
         self.setStatusBar(self.main_statusbar)
+
+    def about(self):
+        QtWidgets.QMessageBox.about(self,
+                                    'About Mentarius',
+                                    'A personal journal/notebook written in Python')
+
+    def aboutQt(self):
+        QtWidgets.QMessageBox.aboutQt(self, 'About Qt')
 
     def new_entry(self):
         newrow = self.entrymodel.rowCount()
