@@ -13,8 +13,6 @@ class EntryEdit(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # self.setObjectName("entry_editpage")
-
         self.edit_layout = QtWidgets.QGridLayout(self)
         self.edit_layout.setObjectName("edit_layout")
         self.edit_layout.setContentsMargins(0, 0, 0, 0)
@@ -602,13 +600,15 @@ class EntryListModel(QtCore.QAbstractTableModel):
         return len(self.__entries)
 
     def data(self, index, role):
-        if (role == QtCore.Qt.DisplayRole) or (role == QtCore.Qt.EditRole):
-            attr_name = self.columns[index.column()]
-            row = self.__entries[index.row()]
-            return getattr(row, attr_name)
+        if index.isValid():
+            if (role == QtCore.Qt.DisplayRole) or (role == QtCore.Qt.EditRole):
+                attr_name = self.columns[index.column()]
+                row = self.__entries[index.row()]
+                return getattr(row, attr_name)
+        return None
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
-        if role == QtCore.Qt.EditRole:
+        if index.isValid() and role == QtCore.Qt.EditRole:
             attr_name = self.columns[index.column()]
             row = self.__entries[index.row()]
             setattr(row, attr_name, value)
@@ -849,6 +849,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.entryproxy.setFilterKeyColumn(datepubcol)
 
         self.entrymapper = QtWidgets.QDataWidgetMapper(self)
+        self.entrymapper.setSubmitPolicy(QtWidgets.QDataWidgetMapper.ManualSubmit)
         self.entrymapper.setModel(self.entryproxy)
         self.entrymapper.addMapping(self.main_entry.entry_editpage.titletext,
                                     titlecol)
@@ -859,7 +860,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.dock_entrylist.entrylist.setModel(self.entryproxy)
         self.dock_entrylist.entrylist.setModelColumn(titlecol)
-        self.dock_entrylist.entrylist.clicked.connect(self.entrymapper.setCurrentModelIndex)
+        self.dock_entrylist.entrylist.activated.connect(self.updateEntry)
+        self.dock_entrylist.entrylist.clicked.connect(self.updateEntry)
 
     def initStatusBar(self):
         self.main_statusbar = QtWidgets.QStatusBar(self)
@@ -876,9 +878,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def aboutQt(self):
         QtWidgets.QMessageBox.aboutQt(self, 'About Qt')
 
+    @QtCore.pyqtSlot(QtCore.QModelIndex)
+    def updateEntry(self, index=QtCore.QModelIndex()):
+        self.entrymapper.submit()
+        if index.isValid():
+            self.entrymapper.setCurrentModelIndex(index)
+        else:
+            self.entrymapper.setCurrentModelIndex(self.dock_entrylist.entrylist.currentIndex())
+
     def new_entry(self):
         newrow = self.entrymodel.rowCount()
         titlecol = self.entrymodel.columns.index('title')
+        self.entrymapper.submit()
         self.entrymodel.insertRows(newrow, 1)
         newindex = self.entryproxy.mapFromSource(self.entrymodel.index(newrow,
                                                                        titlecol))
@@ -887,6 +898,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def delete_entry(self):
         index = self.entryproxy.mapToSource(self.dock_entrylist.entrylist.currentIndex())
+        self.entrymapper.submit()
         self.entrymodel.removeRows(index.row(), 1)
         self.entrymapper.setCurrentModelIndex(self.dock_entrylist.entrylist.currentIndex())
 
