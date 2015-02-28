@@ -4,8 +4,6 @@
 import datetime
 import sqlite3
 
-# from PyQt5 import QtCore, QtGui, QtPrintSupport, QtWidgets, QtWebKitWidgets
-
 from PyQt5.QtCore import (pyqtSignal, pyqtSlot, QAbstractTableModel, QDate,
                           QItemSelection, QMetaObject, QModelIndex, QSize,
                           QSortFilterProxyModel, Qt, QUrl)
@@ -21,10 +19,10 @@ from PyQt5.QtWidgets import (QAction, QApplication, QCalendarWidget,
                              QSizePolicy, QSpacerItem, QStackedWidget,
                              QStatusBar, QTextEdit, QToolBar, QVBoxLayout,
                              QWidget)
-
 import icons
 
 from journal import Entry, Journal
+
 
 class EntryTitleText(QLineEdit):
     '''Custom QLineEdit to emit a signal every time a key is pressed.'''
@@ -510,6 +508,7 @@ class EntryWidget(QWidget):
         # self.entry_viewpage.viewer.setHtml(text, self.baseUrl)
         self.entry_viewpage.viewer.setHtml('<h1>{0}</h1>{1}'.format(title,
                                                                     text))
+
 
 class EntryCalendar(QDockWidget):
     '''A dock widget that handles showing which dates contain entries.'''
