@@ -27,6 +27,7 @@ import icons
 from journal import Entry, Journal
 
 class EntryTitleText(QLineEdit):
+    '''Custom QLineEdit to emit a signal every time a key is pressed.'''
     titlechanged = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -38,6 +39,7 @@ class EntryTitleText(QLineEdit):
 
 
 class EntryEdit(QWidget):
+    '''Widget for handling the editing of single entries.'''
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -379,6 +381,7 @@ class EntryEdit(QWidget):
 
 
 class EntryView(QWidget):
+    '''Widget for displaying the entry in a read-only context.'''
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -396,6 +399,8 @@ class EntryView(QWidget):
 
 
 class EntryWidget(QWidget):
+    '''Widget that combines both the EntryEdit and EntryView widgets so that
+       they can be toggled back and forth.'''
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -507,6 +512,7 @@ class EntryWidget(QWidget):
                                                                     text))
 
 class EntryCalendar(QDockWidget):
+    '''A dock widget that handles showing which dates contain entries.'''
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -611,6 +617,7 @@ class EntryCalendar(QDockWidget):
 
 
 class EntryListModel(QAbstractTableModel):
+    '''This model is customized for the Entry/Journal objects in a python list.'''
     def __init__(self, entries=[], parent=None):
         super().__init__(parent)
         self.__entries = entries
@@ -671,6 +678,7 @@ class EntryListModel(QAbstractTableModel):
 
 
 class EntryFilterProxy(QSortFilterProxyModel):
+    '''Filter entries based on date, showing the correct ones in EntryList.'''
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow,
                                          self.filterKeyColumn(),
@@ -680,6 +688,8 @@ class EntryFilterProxy(QSortFilterProxyModel):
 
 
 class EntryList(QDockWidget):
+    '''A dockwidget that displays a list of entries for a given date referenced
+       by the EntryCalendar.'''
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -919,8 +929,7 @@ class MainWindow(QMainWindow):
         self.entrymapper.setCurrentModelIndex(self.dock_entrylist.entrylist.currentIndex())
 
     def new_journal(self):
-        filename, _ = QFileDialog.getSaveFileName(self,
-                                                  'Create New Journal')
+        filename, _ = QFileDialog.getSaveFileName(self, 'Create New Journal')
 
         if not filename:
             return
