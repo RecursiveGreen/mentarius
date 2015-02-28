@@ -22,6 +22,9 @@ class MentariusCurses():
 
     def cursesMain(self):
         self.stdscr.clear()
+        self.stdscr.addstr(0, 0, "Hello.")
+        self.stdscr.addstr(1, 0, "1")
+        self.stdscr.addstr(2, 0, "2")
         self.stdscr.getkey()
 
     def run(self):
