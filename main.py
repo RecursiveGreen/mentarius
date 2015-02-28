@@ -954,6 +954,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.entrymapper.submit()
         sel_date = self.dock_calendar.calendar.selectedDate()
         self.entryproxy.setFilterRegExp(sel_date.toString(QtCore.Qt.ISODate))
+        if self.entryproxy.rowCount() > 0:
+            titlecol = self.entrymodel.columns.index('title')
+            firstindex = self.entryproxy.index(0, titlecol)
+            self.dock_entrylist.entrylist.setCurrentIndex(firstindex)
+            self.entrymapper.setCurrentModelIndex(firstindex)
+
 
 
 if __name__ == '__main__':
