@@ -66,7 +66,6 @@ class Journal(object):
             nextdate = datelist[founddate + 1]
         except (IndexError, ValueError):
             nextdate = self.closestNext(datelist, date)
-            # nextdate = None
 
         return nextdate
 
@@ -76,13 +75,9 @@ class Journal(object):
         try:
             founddate = datelist.index(date)
             # This stops the negative index wrapping.
-            if founddate > 0:
-                prevdate = datelist[founddate - 1]
-            else:
-                prevdate = None
+            prevdate = datelist[founddate - 1] if founddate > 0 else None
         except (IndexError, ValueError):
             prevdate = self.closestPrevious(datelist, date)
-            # prevdate = None
 
         return prevdate
 
