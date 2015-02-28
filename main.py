@@ -522,7 +522,7 @@ class EntryCalendar(QDockWidget):
         self.dock_widget_layout = QVBoxLayout(self.dock_widget)
         self.dock_widget_layout.setSpacing(0)
         self.dock_widget_layout.setContentsMargins(0, 0, 0, 0)
-        # self.dock_widget.setLayout(self.dock_widget_layout)
+        self.dock_widget.setLayout(self.dock_widget_layout)
 
         self.toolbar = QToolBar()
         self.calendar = QCalendarWidget(self.dock_widget)
@@ -545,6 +545,7 @@ class EntryCalendar(QDockWidget):
         self.setWidget(self.dock_widget)
 
         self.topLevelChanged.connect(self.on_move)
+        self.calendar.currentPageChanged.connect(self.showEntries)
 
         self.initActions()
         self.initToolbars()
@@ -970,6 +971,7 @@ class MainWindow(QMainWindow):
     def save_journal(self):
         self.journal.save()
 
+    @pyqtSlot()
     def filterDates(self):
         self.entrymapper.submit()
         sel_date = self.dock_calendar.calendar.selectedDate()
