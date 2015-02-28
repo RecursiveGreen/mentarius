@@ -56,9 +56,50 @@ class Journal(object):
         pub = [x.date_published
                for x in self.entries
                if x.date_published.month == month and x.date_published.year == year]
-        return list(set(pub))
+        return sorted(list(set(pub)))
 
+    def nextDate(self, date):
+        datelist = list(set([x.date_published for x in self.entries]))
+        datelist.sort()
+        try:
+            founddate = datelist.index(date)
+            nextdate = datelist[founddate + 1]
+        except (IndexError, ValueError):
+            nextdate = self.closestNext(datelist, date)
+            # nextdate = None
 
-# recordedip = [x['value']
-#              for x in ipdata.json()['data']
-#              if x['record'] == DNSNAME and x['type'] == 'A'][0]
+        return nextdate
+
+    def previousDate(self, date):
+        datelist = list(set([x.date_published for x in self.entries]))
+        datelist.sort()
+        try:
+            founddate = datelist.index(date)
+            # This stops the negative index wrapping.
+            if founddate > 0:
+                prevdate = datelist[founddate - 1]
+            else:
+                prevdate = None
+        except (IndexError, ValueError):
+            prevdate = self.closestPrevious(datelist, date)
+            # prevdate = None
+
+        return prevdate
+
+    def closestNext(self, datelist, date):
+        def deltafunc(x):
+            delta = x - date if x > date else datetime.timedelta.max
+            return delta
+        if date >= datelist[len(datelist) - 1]:
+            return None
+        else:
+            return min(datelist, key=deltafunc)
+
+    def closestPrevious(self, datelist, date):
+        def deltafunc(x):
+            delta = date - x if x < date else datetime.timedelta.max
+            return delta
+        if date <= datelist[0]:
+            return None
+        else:
+            return min(datelist, key=deltafunc)
