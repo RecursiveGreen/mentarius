@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
 import curses
+
 from journal import Entry, Journal
 
 class MentariusCurses():
@@ -8,7 +10,23 @@ class MentariusCurses():
     stdscr = None
 
     def __init__(self):
-        self.journal = Journal()
+        pass
+
+    def usage(self):
+        print("Usage: " + sys.argv[0] + " [JOURNAL FILE]")
+
+    def journalOpenInitial(self):
+        numArgs = len(sys.argv)
+        if numArgs == 1:
+            self.journalOpen("test.mentdb")
+        elif numArgs == 2:
+            self.journalOpen(sys.argv[1])
+        else:
+            self.usage()
+            sys.exit(1)
+
+    def journalOpen(self, filename = ""):
+        pass
 
     def displayEntryTitles(self, journal):
         for entry in journal.entries:
@@ -28,7 +46,9 @@ class MentariusCurses():
         curses.echo()
         curses.endwin()
 
-    def cursesMain(self):
+    def main(self):
+
+        self.journalOpenInitial();
 
         self.stdscr.clear()
 
@@ -47,10 +67,9 @@ class MentariusCurses():
     def run(self):
         try:
             self.cursesInit()
-            self.cursesMain()
+            self.main()
         finally:
             self.cursesTeardown()
 
 if __name__ == '__main__':
-    mentarius = MentariusCurses()
-    mentarius.run()
+    MentariusCurses().run()
