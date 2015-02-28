@@ -458,7 +458,6 @@ class EntryWidget(QtWidgets.QWidget):
         self.entry_editpage.titletext.clear()
         self.entry_editpage.bodytext.clear()
         self.entry_viewpage.viewer.setUrl(QtCore.QUrl("about:blank"))
-        self.entry_widget.setCurrentWidget(self.entry_editpage)
 
     def toggleEntry(self):
         if self.act_edit.isVisible():
@@ -733,7 +732,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_widget_layout.setContentsMargins(0, 0, 0, 0)
 
         self.main_entry = EntryWidget(self.main_widget)
-        # self.main_entry.setEnabled(False)
+        self.main_entry.setEnabled(False)
 
         self.main_widget_layout.addWidget(self.main_entry)
 
@@ -860,8 +859,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.dock_entrylist.entrylist.setModel(self.entryproxy)
         self.dock_entrylist.entrylist.setModelColumn(titlecol)
-        self.dock_entrylist.entrylist.activated.connect(self.updateEntry)
-        self.dock_entrylist.entrylist.clicked.connect(self.updateEntry)
+        self.dock_entrylist.entrylist.selectionModel().selectionChanged.connect(self.updateEntry)
 
     def initStatusBar(self):
         self.main_statusbar = QtWidgets.QStatusBar(self)
@@ -878,13 +876,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def aboutQt(self):
         QtWidgets.QMessageBox.aboutQt(self, 'About Qt')
 
-    @QtCore.pyqtSlot(QtCore.QModelIndex)
-    def updateEntry(self, index=QtCore.QModelIndex()):
-        self.entrymapper.submit()
-        if index.isValid():
-            self.entrymapper.setCurrentModelIndex(index)
+    @QtCore.pyqtSlot(QtCore.QItemSelection)
+    def updateEntry(self, item=QtCore.QItemSelection()):
+        if not item.indexes():
+            self.main_entry.reset()
+            self.main_entry.setEnabled(False)
         else:
-            self.entrymapper.setCurrentModelIndex(self.dock_entrylist.entrylist.currentIndex())
+            self.entrymapper.submit()
+            self.main_entry.setEnabled(True)
+            self.entrymapper.setCurrentModelIndex(item.indexes()[0])
 
     def new_entry(self):
         newrow = self.entrymodel.rowCount()
