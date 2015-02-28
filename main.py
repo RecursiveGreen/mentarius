@@ -9,6 +9,17 @@ import icons
 
 from journal import Entry, Journal
 
+class EntryTitleText(QtWidgets.QLineEdit):
+    titlechanged = QtCore.pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def keyPressEvent(self, event):
+        super().keyPressEvent(event)
+        self.titlechanged.emit()
+
+
 class EntryEdit(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -28,7 +39,7 @@ class EntryEdit(QtWidgets.QWidget):
         self.titlelabel.setText("Title:")
         self.edit_layout.addWidget(self.titlelabel, 2, 0, 1, 1)
 
-        self.titletext = QtWidgets.QLineEdit(self)
+        self.titletext = EntryTitleText(self)
         self.titletext.setObjectName("entry_titletext")
         self.titletext.setMaxLength(255)
         self.edit_layout.addWidget(self.titletext, 2, 1, 1, 1)
@@ -859,7 +870,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.dock_entrylist.entrylist.setModel(self.entryproxy)
         self.dock_entrylist.entrylist.setModelColumn(titlecol)
-        self.dock_entrylist.entrylist.selectionModel().selectionChanged.connect(self.updateEntry)
+        self.dock_entrylist.entrylist.selectionModel().selectionChanged.connect(self.updateEntryWidget)
+
+        self.main_entry.entry_editpage.titletext.titlechanged.connect(self.entrymapper.submit)
 
     def initStatusBar(self):
         self.main_statusbar = QtWidgets.QStatusBar(self)
@@ -877,7 +890,8 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.aboutQt(self, 'About Qt')
 
     @QtCore.pyqtSlot(QtCore.QItemSelection)
-    def updateEntry(self, item=QtCore.QItemSelection()):
+    def updateEntryWidget(self, item=QtCore.QItemSelection()):
+        # PyQt converts QList to python 'lists'.
         if not item.indexes():
             self.main_entry.reset()
             self.main_entry.setEnabled(False)
@@ -937,6 +951,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.journal.save()
 
     def filterDates(self):
+        self.entrymapper.submit()
         sel_date = self.dock_calendar.calendar.selectedDate()
         self.entryproxy.setFilterRegExp(sel_date.toString(QtCore.Qt.ISODate))
 
