@@ -594,10 +594,20 @@ class EntryCalendar(QDockWidget):
             self.resize(self.sizeHint())
 
     def prevEntry(self):
-        pass
+        selectdate = self.calendar.selectedDate().toPyDate()
+        prevdate = self.parent().journal.previousDate(selectdate)
+        if prevdate:
+            self.calendar.setSelectedDate(QDate(prevdate.year,
+                                                prevdate.month,
+                                                prevdate.day))
 
     def nextEntry(self):
-        pass
+        selectdate = self.calendar.selectedDate().toPyDate()
+        nextdate = self.parent().journal.nextDate(selectdate)
+        if nextdate:
+            self.calendar.setSelectedDate(QDate(nextdate.year,
+                                                nextdate.month,
+                                                nextdate.day))
 
     def today(self):
         self.calendar.setSelectedDate(QDate.currentDate())
