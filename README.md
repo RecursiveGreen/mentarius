@@ -2,8 +2,13 @@
 A personal diary/notebook written in Python.
 
 ## Running
+
 ```
+# PyQt5 frontend:
 ./main.py
+
+# Curses frontend (barely functional):
+./main_curses.py [FILE]
 ```
 
 ## Requirements
