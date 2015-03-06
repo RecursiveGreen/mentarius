@@ -29,6 +29,9 @@ class Entry(object):
 from storage import Sqlite3Storage
 
 class Journal(object):
+
+    name = None
+
     def __init__(self, config=dict()):
         self.config = config
         self.entries = list()
@@ -44,6 +47,7 @@ class Journal(object):
         self.config['filename'] = filename
         s = Sqlite3Storage()
         self.entries = s.load(filename)
+        self.name = filename
 
     def save(self):
         s = Sqlite3Storage()
