@@ -2,12 +2,12 @@
 A personal diary/notebook written in Python.
 
 ## Running
-
-```
-# PyQt5 frontend:
+PyQt5 frontend:
+```shelll
 ./main.py
-
-# Curses frontend (barely functional):
+```
+Curses frontend (barely functional):
+```shell
 ./main_curses.py [FILE]
 ```
 
