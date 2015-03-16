@@ -8,17 +8,76 @@ class Entry(object):
                  date_created=datetime.datetime.now(),
                  date_modified=datetime.datetime.now(),
                  date_published=datetime.date.today(),
-                 entry_id=None,
                  title='',
                  body=''):
-        self.date_created = date_created
-        self.date_modified = date_modified
-        self.date_published = date_published
-        self.entry_id = entry_id
-        self.title = title
-        self.body = body
+        self._date_created = date_created
+        self._date_modified = date_modified
+        self._date_published = date_published
+        # self._entry_id = entry_id
+        self._title = title
+        self._body = body
 
         self.modified = False
+
+    def get_date_created(self):
+        return self._date_created
+    def set_date_created(self, value):
+        self._date_created = value
+        self.modified = True
+    def del_date_created(self):
+        del self._date_created
+    date_created = property(get_date_created,
+                            set_date_created,
+                            del_date_created,
+                            "A timestamp from when the entry was created.")
+
+    def get_date_modified(self):
+        return self._date_modified
+    def set_date_modified(self, value):
+        self._date_modified = value
+        self.modified = True
+    def del_date_modified(self):
+        del self._date_modified
+    date_modified = property(get_date_modified,
+                             set_date_modified,
+                             del_date_modified,
+                             "A timestamp from when the entry was last modified.")
+
+    def get_date_published(self):
+        return self._date_published
+    def set_date_published(self, value):
+        self._date_published = value
+        self.modified = True
+    def del_date_published(self):
+        del self._date_published
+    date_published = property(get_date_published,
+                              set_date_published,
+                              del_date_published,
+                              "The date at which the entry is published.")
+
+    def get_title(self):
+        return self._title
+    def set_title(self, value):
+        self._title = value
+        self.modified = True
+    def del_title(self):
+        del self._title
+    title = property(get_title,
+                     set_title,
+                     del_title,
+                     "The title of the entry.")
+
+    def get_body(self):
+        return self._body
+    def set_body(self, value):
+        self._body = value
+        self.modified = True
+    def del_body(self):
+        del self._body
+    body = property(get_body,
+                    set_body,
+                    del_body,
+                    "The body of the entry.")
 
     def __repr__(self):
         if self.title:
