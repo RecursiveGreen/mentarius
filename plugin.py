@@ -19,7 +19,7 @@ class StoragePlugin(object, metaclass=PluginRegistry):
         return None
 
     def load(self):
-        ''' Loads a journal from storage. '''
+        ''' Loads a journal from storage. Returns a list of entries.'''
         return None
 
     def save(self):

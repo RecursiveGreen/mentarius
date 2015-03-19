@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import configparser
 import datetime
 
 class Entry(object):
@@ -13,7 +14,6 @@ class Entry(object):
         self._date_created = date_created
         self._date_modified = date_modified
         self._date_published = date_published
-        # self._entry_id = entry_id
         self._title = title
         self._body = body
 
@@ -92,11 +92,14 @@ class Journal(object):
 
     name = None
 
-    def __init__(self, config=dict()):
-        self.config = config
+    def __init__(self, config_file=None):
+        self.config = configparser.ConfigParser()
         self.entries = list()
         self.to_delete = list()
         self.current_entry = None
+
+        if config_file:
+            self.config.read(config_file)
 
     def new(self, filename):
         self.config['filename'] = filename
