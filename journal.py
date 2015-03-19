@@ -17,6 +17,7 @@ class Entry(object):
         self._title = title
         self._body = body
 
+        self.extra = dict()
         self.modified = False
 
     def get_date_created(self):
