@@ -86,7 +86,8 @@ class Entry(object):
         else:
             return '(Untitled Entry)'
 
-from storage import Sqlite3Storage
+
+from plugin import PluginRegistry
 
 class Journal(object):
 
@@ -94,28 +95,29 @@ class Journal(object):
 
     def __init__(self, config_file=None):
         self.config = configparser.ConfigParser()
-        self.entries = list()
-        self.to_delete = list()
         self.current_entry = None
+        self.entries = list()
+        self.storage_engine = None
+        self.to_delete = list()
 
         if config_file:
             self.config.read(config_file)
+            self.init_storage_engine()
 
-    def new(self, filename):
-        self.config['filename'] = filename
-        s = Sqlite3Storage()
-        s.new(filename)
+    def init_storage_engine(self):
+        class_name = self.config['storage']['engine']
+        plug = [x for x in PluginRegistry.plugins if x.__name__ == class_name]
+        if plug:
+            self.storage_engine = plug[0](self)
 
-    def load(self, filename):
-        self.config['filename'] = filename
-        s = Sqlite3Storage()
-        self.entries = s.load(filename)
-        self.name = filename
+    def new(self):
+        self.storage_engine.new()
+
+    def load(self):
+        self.storage_engine.load()
 
     def save(self):
-        s = Sqlite3Storage()
-        modified_entries = [x for x in self.entries if x.modified]
-        s.save(self.config['filename'], modified_entries, self.to_delete)
+        self.storage_engine.save()
 
     def publishedDateList(self,
                           month=datetime.date.today().month,
