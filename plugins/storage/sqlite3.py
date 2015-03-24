@@ -55,7 +55,7 @@ class Sqlite3Storage(StoragePlugin):
                 entry.extra['entry_id'] = r['entry_id']
                 entries.append(entry)
 
-        return entries
+        self.journal.entries = entries
 
     def save(self):
         db = sqlite3.connect(self.journal.config['storage']['path'],
