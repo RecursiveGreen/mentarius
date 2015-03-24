@@ -653,7 +653,7 @@ class EntryListModel(QAbstractTableModel):
             attr_name = self.columns[index.column()]
             row = self.__entries[index.row()]
             setattr(row, attr_name, value)
-            setattr(row, 'date_modified', datetime.datetime.now())
+            setattr(row, '_date_modified', datetime.datetime.now())
             setattr(row, 'modified', True)
             self.dataChanged.emit(index, index)
             return True
@@ -872,9 +872,9 @@ class MainWindow(QMainWindow):
         self.entrymodel.rowsMoved.connect(self.dock_calendar.showEntries)
         self.entrymodel.rowsRemoved.connect(self.dock_calendar.showEntries)
 
-        bodycol = self.entrymodel.columns.index('body')
-        titlecol = self.entrymodel.columns.index('title')
-        datepubcol = self.entrymodel.columns.index('date_published')
+        bodycol = self.entrymodel.columns.index('_body')
+        titlecol = self.entrymodel.columns.index('_title')
+        datepubcol = self.entrymodel.columns.index('_date_published')
 
         self.entryproxy = EntryFilterProxy(self)
         self.entryproxy.setDynamicSortFilter(True)
@@ -925,7 +925,7 @@ class MainWindow(QMainWindow):
 
     def new_entry(self):
         newrow = self.entrymodel.rowCount()
-        titlecol = self.entrymodel.columns.index('title')
+        titlecol = self.entrymodel.columns.index('_title')
         self.entrymapper.submit()
         self.entrymodel.insertRows(newrow, 1)
         newindex = self.entryproxy.mapFromSource(self.entrymodel.index(newrow,
@@ -977,7 +977,7 @@ class MainWindow(QMainWindow):
         sel_date = self.dock_calendar.calendar.selectedDate()
         self.entryproxy.setFilterRegExp(sel_date.toString(Qt.ISODate))
         if self.entryproxy.rowCount() > 0:
-            titlecol = self.entrymodel.columns.index('title')
+            titlecol = self.entrymodel.columns.index('_title')
             firstindex = self.entryproxy.index(0, titlecol)
             self.dock_entrylist.entrylist.setCurrentIndex(firstindex)
             self.entrymapper.setCurrentModelIndex(firstindex)
@@ -987,7 +987,7 @@ if __name__ == '__main__':
     import sys
 
     discover_plugins(['plugins'])
-    
+
     app = QApplication(sys.argv)
     mentarius = MainWindow()
     mentarius.show()
