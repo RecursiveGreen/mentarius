@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QCalendarWidget,
 import icons
 
 from journal import Entry, Journal
+from plugin import PluginRegistry, discover_plugins
 
 
 class EntryTitleText(QLineEdit):
@@ -985,6 +986,8 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     import sys
 
+    discover_plugins(['plugins'])
+    
     app = QApplication(sys.argv)
     mentarius = MainWindow()
     mentarius.show()
